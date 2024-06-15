@@ -9,6 +9,32 @@ return_code::return_code(const error_code ec) : error_codes{ec} {
 
 }
 
+/* Operators section */
+bool return_code::operator==(const return_code& rc) {
+            
+    return (error_codes == rc.error_codes);
+}
+
+bool return_code::operator!=(const return_code& rc) {
+            
+    return !(*this == rc);
+}
+
+bool return_code::operator==(const error_code ec) {
+
+    return ((error_codes.size() == 1) && (*error_codes.begin() == ec));
+}
+
+bool return_code::operator!=(const error_code ec) {
+
+    return !(*this == ec);
+}
+
+return_code::operator bool() {
+
+    return ((error_codes.size() == 1) && (*error_codes.begin() == return_code::Ok));
+}
+
 std::ostream& operator<<(std::ostream& lhs, const return_code& rhs) {
 
     if (rhs.error_codes.empty()) {

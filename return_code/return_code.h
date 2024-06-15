@@ -19,6 +19,12 @@ class return_code {
         return_code(const return_code& rc);
         return_code(const error_code ec);
 
+        bool operator==(const return_code& rc);
+        bool operator!=(const return_code& rc);
+        bool operator==(const error_code ec);
+        bool operator!=(const error_code ec);
+        operator bool();
+
         friend std::ostream& operator<<(std::ostream& lhs, const return_code& rhs);
 
     private:
