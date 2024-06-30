@@ -2,7 +2,7 @@ CC:=gcc
 CFLAGS:=-c
 
 SRCS:=main.c alloc_stat.c
-OBJS:=$(patsubst %.cpp, build/%.o, $(SRCS))
+OBJS:=$(patsubst %.c, build/%.o, $(SRCS))
 
 
 all: directories test
@@ -13,8 +13,8 @@ directories: build
 test: $(OBJS)
 	$(CC) $^ -o build/$@
 
-build/%.o: %.cpp
-	$(CC) $(CFLAGS) $< -o $@
+build/%.o: %.c
+	$(CC) $(CFLAGS) -g $< -o $@
 
 clean:
 	rm -r build

@@ -20,9 +20,19 @@ typedef struct {
     unsigned int line;
 } alloc_stat_entry_t;
 
+
+struct alloc_entry {
+    void* alloc_ptr;
+    size_t alloc_size;
+    struct alloc_entry* next;
+};
+
+typedef struct alloc_entry alloc_entry_t;
+
 typedef struct {
     alloc_stat_entry_t last_alloc;
     size_t total_alloc_size;
+    alloc_entry_t* alloc_list;
 } alloc_stat_t;
 
 #endif /* _ALLOC_STAT_H_ */

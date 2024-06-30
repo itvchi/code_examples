@@ -8,9 +8,15 @@ int main(int argc, char const *argv[]) {
 
     int* ptr;
     ptr = (int*)MALLOC(100);
+    stat_print(MODULE_ID);
+    ptr = (int*)MALLOC(150);
+    stat_print(MODULE_ID);
+    FREE(ptr);
+    stat_print(MODULE_ID);
     ptr = (int*)MALLOC(150);
     stat_print(MODULE_ID);
     ptr = (int*)MALLOC(100);
+    stat_print(MODULE_ID);
     ptr = (int*)MALLOC(250);
     stat_print(MODULE_ID);
 
