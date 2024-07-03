@@ -6,23 +6,25 @@
 
 int main(int argc, char const *argv[]) {
 
-    int* ptr;
-    ptr = (int*)MALLOC(100);
-    stat_print(MODULE_ID);
-    ptr = (int*)MALLOC(150);
-    stat_print(MODULE_ID);
-    FREE(ptr);
-    stat_print(MODULE_ID);
-    ptr = (int*)MALLOC(150);
-    stat_print(MODULE_ID);
-    ptr = (int*)MALLOC(100);
-    stat_print(MODULE_ID);
-    ptr = (int*)MALLOC(250);
-    stat_print(MODULE_ID);
+    int* i_ptr;
+    double* d_ptr;
+    
+    i_ptr = (int*)MALLOC(sizeof(int));
+    i_ptr = (int*)CALLOC(2, sizeof(int));
+    FREE(i_ptr);
+    alloc_stats(DEFAULT_STAT_FLAGS); /* sizeof(int) should be leaked */
+    
+    i_ptr = (int*)MALLOC(10);
+    d_ptr = (double*)MALLOC(sizeof(double));
+    alloc_stats(DEFAULT_STAT_FLAGS);
+    
+    FREE(i_ptr);
+    FREE(d_ptr);
+    alloc_stats(DEFAULT_STAT_FLAGS);
 
-    if (ptr) {
-        FREE(ptr);
-    }
+    d_ptr = (double*)CALLOC(15, sizeof(double));
+    i_ptr = (int*)MALLOC(20);
+    alloc_stats(DETAILED_STAT_FLAGS);
 
     return 0;
 }

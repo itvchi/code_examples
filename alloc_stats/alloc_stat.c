@@ -110,7 +110,7 @@ void stat_free(unsigned int module_id, unsigned int line, const char* function, 
     size_t size;
 
     if (delete_entry(&(module_info[module_id].alloc_list), ptr, &size)) {
-        module_info[module_id].total_alloc_size -= size;
+        module_info[module_id].total_free_size += size;
     }
 
     free(ptr);
@@ -132,8 +132,77 @@ static char* print_timestamp(char *buffer, const timestamp_t timestamp) {
 
 void stat_print(unsigned int module_id) {
 
-    char buffer[80];
-    alloc_stat_entry_t *last_alloc = &module_info[module_id].last_alloc;
+    char                                    buffer[80] = {0};
+    alloc_stat_entry_t*                     last_alloc = &module_info[module_id].last_alloc;
+
     printf("Last alloc - size: %ld, from: %s @%d, at: %s\n", last_alloc->size, last_alloc->function, last_alloc->line, print_timestamp(buffer, last_alloc->timestamp));
     printf("Total alloc size: %ld\n", module_info[module_id].total_alloc_size);
+}
+
+void alloc_stats(const stat_type_t flags) {
+
+    char                                    buffer[256] = {0};
+    size_t                                  length_index = 0;
+
+    printf("%15s  %15s  ", "Module id", "Module_name");
+    length_index = sprintf(buffer, "%s", "_______________  _______________  ");
+
+    if (flags & STAT_TOTAL_ALLOC) {
+        printf("%15s  ", "Total alloc");
+        length_index += sprintf(&buffer[length_index], "%s", "_______________  ");
+    }
+
+    if (flags & STAT_TOTAL_FREE) {
+        printf("%15s  ", "Total free");
+        length_index += sprintf(&buffer[length_index], "%s", "_______________  ");
+    }
+
+    if (flags & STAT_IN_USE) {
+        printf("%15s  ", "In use");
+        length_index += sprintf(&buffer[length_index], "%s", "_______________  ");
+    }
+
+    if (flags & STAT_LAST_ALLOC) {
+        printf("%15s  ", "Last alloc");
+        length_index += sprintf(&buffer[length_index], "%s", "__________________________________________________  ");
+    }
+
+    printf("\n");
+    printf("%s\n", buffer);
+
+    for (size_t module_id = 0; module_id < 100; module_id++) {
+        
+        size_t* alloc = &module_info[module_id].total_alloc_size;
+        if (*alloc == 0) {
+            continue;
+        }
+
+        printf("%15ld  %15s  ", module_id, "x");
+        
+        length_index = 0;
+        size_t* free = &module_info[module_id].total_free_size;
+
+        if (flags & STAT_TOTAL_ALLOC) {
+            length_index += sprintf(&buffer[length_index], "%15ld  ", *alloc);
+        }
+
+        if (flags & STAT_TOTAL_FREE) {
+            length_index += sprintf(&buffer[length_index], "%15ld  ", *free);
+        }
+
+        if (flags & STAT_IN_USE) {
+            length_index += sprintf(&buffer[length_index], "%15ld  ", (*alloc - *free));
+        }
+
+        if (flags & STAT_LAST_ALLOC) {
+            alloc_stat_entry_t* last_alloc = &module_info[module_id].last_alloc;
+            length_index += sprintf(&buffer[length_index], "%ldB, f: %s() @%d at:",
+                last_alloc->size, last_alloc->function, last_alloc->line);
+            print_timestamp(&buffer[length_index], last_alloc->timestamp);
+        }
+        
+        printf("%s\n", buffer);
+    }
+
+    printf("\n");
 }

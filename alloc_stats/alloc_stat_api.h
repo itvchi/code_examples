@@ -8,7 +8,7 @@
 #if (MODULE_ID < 100)
 
 #define MALLOC(size)        stat_malloc(MODULE_ID, __LINE__, __FUNCTION__, (size))
-#define CALLOC(n, szie)     stat_calloc(MODULE_ID, __LINE__, __FUNCTION__, (n), (size))    
+#define CALLOC(n, size)     stat_calloc(MODULE_ID, __LINE__, __FUNCTION__, (n), (size))    
 #define FREE(ptr)           stat_free(MODULE_ID, __LINE__, __FUNCTION__, (ptr))
 
 #else
@@ -27,6 +27,5 @@
 #define FREE(ptr)           ((void)0)
 
 #endif /* defined(MODULE) */
-
 
 #endif /* _ALLOC_STAT_API_H_ */
