@@ -71,6 +71,23 @@ namespace utils {
                 return timestamp<common_t>(result_value);
             }
 
+            template<typename U>
+            bool operator<(const timestamp<U>& rhs) const {
+                using common_t = common_time_unit_t<T, U>;
+                timestamp<common_t> lhs_converted = *this;
+                timestamp<common_t> rhs_converted = rhs;
+                return (lhs_converted.get() < rhs_converted.get());
+            }
+
+            template<typename U>
+            bool operator>(const timestamp<U>& rhs) const {
+                using common_t = common_time_unit_t<T, U>;
+                timestamp<common_t> lhs_converted = *this;
+                timestamp<common_t> rhs_converted = rhs;
+                return (lhs_converted.get() > rhs_converted.get());
+            }
+
+
         private:
             long long value_;
 
