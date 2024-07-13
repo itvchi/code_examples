@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 enum class log_level {
     EMERG = 0,
@@ -17,6 +18,8 @@ enum class log_level {
     RACKET,
     TRACE
 };
+
+
 
 class message_channel {
     public:
