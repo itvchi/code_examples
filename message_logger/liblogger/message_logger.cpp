@@ -5,28 +5,6 @@
 
 #include <sys/stat.h>
 
-format operator<<(const std::string& lhs, const format_element& rhs) {
-
-    format f;
-    f << lhs << rhs;
-    return f;
-}
-
-format operator<<(const char* lhs, const format_element::type& rhs) {
-
-    return (std::string(lhs) << rhs);
-}
-
-format& format::operator<<(const format_element::type& other) {
-    f.push_back(format_element{other});
-    return *this;
-}
-
-format& format::operator<<(const std::string& other) {
-    f.push_back(format_element{other});
-    return *this;
-}
-
 static std::map<log_level, std::string> level_map = {
     {log_level::EMERG,      "EMERG"     },
     {log_level::ALERT,      "ALERT"     },
@@ -40,7 +18,7 @@ static std::map<log_level, std::string> level_map = {
     {log_level::RACKET,     "RACKET"    },
     {log_level::TRACE,      "TRACE"     },
 };
-
+ 
 std::ostream& operator<< (std::ostream& os, const log_level level) {
     
     if (level_map.count(level)) {
@@ -83,8 +61,8 @@ void message_logger::register_channel(const std::string name, const log_level le
     // }
 }
 
-void message_logger::set_format(const format f_) {
-    f = f_;
+void message_logger::set_format(const logger_format format) {
+    message_format = format;
 }
 
 #define COLOR_RESET     "\x1b[0m"
@@ -147,24 +125,8 @@ void message_logger::log(const std::string& channel, const log_level level, cons
     if (level_per_channel.count(channel)) {
         if (level <= level_per_channel[channel]) {
             /* Print format */
-            for (const auto& element : f) {
-                if (element.t == format_element::String) {
-                    std::cout << element.x;
-                } else {
-                    switch (element.t) {
-                        case format_element::Channel:
-                            std::cout << channel;
-                            break;
-                        case format_element::Level:
-                            std::cout << level;
-                            break;
-                        case format_element::LevelColor:
-                            std::cout << level_color(level);
-                            break;
-                        default:
-                            break;
-                    }
-                }
+            for (const auto& element : message_format) {
+
             }
             /* then print message */
             std::cout << data;
