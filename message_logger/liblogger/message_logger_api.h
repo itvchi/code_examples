@@ -24,9 +24,6 @@ class message_logger {
         std::fstream config;
         std::map<std::string, log_level> level_per_channel;
         logger_format message_format;
-
-        void process(const logger_format::type t);
-        void process(const std::string& s);
 };
 
 class message_logger_stream {

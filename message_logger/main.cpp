@@ -7,7 +7,7 @@ int main(int argc, char const *argv[]) {
 
     MSG_INIT();
 
-    get_logger().set_format("[" << logger_format::LevelColor << "] [" << logger_format::Channel << "] ");
+    get_logger().set_format("[" << logger_format::DateTime << "] [" << logger_format::LevelColor << "] [" << logger_format::Channel << "] ");
 
     MSG_IN() << "Test info level";
     MSG_DB() << "Test debug level";

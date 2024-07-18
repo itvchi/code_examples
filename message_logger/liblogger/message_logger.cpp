@@ -1,6 +1,8 @@
 #include "message_logger.h"
 #include "message_logger_api.h"
 
+#include <chrono>
+#include <iomanip>
 #include <iostream>
 
 #include <sys/stat.h>
@@ -126,7 +128,28 @@ void message_logger::log(const std::string& channel, const log_level level, cons
         if (level <= level_per_channel[channel]) {
             /* Print format */
             for (const auto& element : message_format) {
-
+                if (const std::string* text = std::get_if<std::string>(&element)) {
+                    std::cout << *text;
+                } else {
+                    switch (std::get<logger_format::type>(element)) {
+                        case logger_format::DateTime: {
+                            time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+                            std::cout << std::put_time(localtime(&now), "%F %T");
+                        }
+                            break;
+                        case logger_format::Level: 
+                            std::cout << level; 
+                            break;
+                        case logger_format::LevelColor: 
+                            std::cout << level_color(level); 
+                            break;
+                        case logger_format::Channel: 
+                            std::cout << channel; 
+                            break;
+                        default:
+                            break;
+                    }
+                }
             }
             /* then print message */
             std::cout << data;

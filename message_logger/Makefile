@@ -16,7 +16,7 @@ all: liblogger main
 directories: dir_build dir_liblogger
 
 test:
-	LD_LIBRARY_PATH=$(LIB_PATH):$LD_LIBRARY_PATH ./build/main
+	LD_LIBRARY_PATH=$(BUILD_DIR)/$(LIB_PATH):$(LD_LIBRARY_PATH) ./build/main
 
 main: $(OBJS) 
 	$(CC) $^ -o build/$@ -L$(BUILD_DIR)/$(LIB_PATH) -llogger
