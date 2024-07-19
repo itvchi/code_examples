@@ -10,6 +10,23 @@
 
 #include "logger_format.h"
 
+class channel_info {
+    public:
+        channel_info(const std::string& name, const log_level level) : name_{name}, level_{level} {}
+
+        std::string name() const {
+            return name_;
+        }
+
+        log_level level() const {
+            return level_;
+        }
+
+    private:
+        std::string name_;
+        log_level   level_;
+};
+
 class message_logger {
     public:
         message_logger();
@@ -22,7 +39,7 @@ class message_logger {
         
     private:
         std::fstream config;
-        std::map<std::string, log_level> level_per_channel;
+        std::vector<channel_info> channels;
         logger_format message_format;
 };
 

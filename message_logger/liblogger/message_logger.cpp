@@ -1,6 +1,7 @@
 #include "message_logger.h"
 #include "message_logger_api.h"
 
+#include <algorithm>
 #include <chrono>
 #include <iomanip>
 #include <iostream>
@@ -52,7 +53,7 @@ message_logger::~message_logger() {
 
 void message_logger::register_channel(const std::string name, const log_level level) {
 
-    level_per_channel[name] = level;
+    channels.emplace_back(name, level);
 
     // std::ofstream config("./config", std::fstream::out | std::fstream::trunc);
     // if (config.is_open()) {
@@ -122,10 +123,12 @@ static std::string level_color(const log_level level) {
     return fmt_ss.str();
 }
 
-void message_logger::log(const std::string& channel, const log_level level, const std::string& data) {
+void message_logger::log(const std::string& channel_name, const log_level level, const std::string& data) {
 
-    if (level_per_channel.count(channel)) {
-        if (level <= level_per_channel[channel]) {
+    auto channel = std::find_if(channels.begin(), channels.end(), [&](const channel_info& entry) { return (entry.name() == channel_name); });
+
+    if (channel != channels.end()) {
+        if (level <= channel->level()) {
             /* Print format */
             for (const auto& element : message_format) {
                 if (const std::string* text = std::get_if<std::string>(&element)) {
@@ -144,7 +147,7 @@ void message_logger::log(const std::string& channel, const log_level level, cons
                             std::cout << level_color(level); 
                             break;
                         case logger_format::Channel: 
-                            std::cout << channel; 
+                            std::cout << channel->name(); 
                             break;
                         default:
                             break;

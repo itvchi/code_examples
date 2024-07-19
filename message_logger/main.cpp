@@ -16,7 +16,7 @@ int main(int argc, char const *argv[]) {
         sleep(2);
         MSG_IN() << "Test info level";
         sleep(1);
-        MSG_NO() << "Test debug level";
+        MSG_NO() << "Test notice level";
     }
 
     return 0;
