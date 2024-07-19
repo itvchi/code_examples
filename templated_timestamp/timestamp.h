@@ -58,7 +58,7 @@ namespace utils {
                 using common_t = common_time_unit_t<T, U>;
                 timestamp<common_t> lhs_converted = *this;
                 timestamp<common_t> rhs_converted = rhs;
-                int result_value = lhs_converted.get() - rhs_converted.get();
+                long long result_value = lhs_converted.get() - rhs_converted.get();
                 return timestamp<common_t>(result_value);
             }
 
@@ -67,7 +67,7 @@ namespace utils {
                 using common_t = common_time_unit_t<T, U>;
                 timestamp<common_t> lhs_converted = *this;
                 timestamp<common_t> rhs_converted = rhs;
-                int result_value = lhs_converted.get() + rhs_converted.get();
+                long long result_value = lhs_converted.get() + rhs_converted.get();
                 return timestamp<common_t>(result_value);
             }
 
