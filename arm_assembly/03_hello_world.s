@@ -1,5 +1,4 @@
 @Print "Hello world!" string to stdout
-
 .global _start
 
 _start:
