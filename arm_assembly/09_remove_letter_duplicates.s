@@ -25,6 +25,7 @@ loop:
 	b	 loop
 
 end:
+	nullwrite	instr
 	nullwrite	outstr
 
 	@Setup exit syscall
