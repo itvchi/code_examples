@@ -6,23 +6,23 @@
 @ r2: string byte value
 @ r3: str length
 
-@Labels:
-@ strlen_loop: loop entry point of string length calculation
-@ null_found: exit after finding null byte
+@Labels (use local labels for multiple macro usage outside):
+@ 1: loop entry point of string length calculation
+@ 2: exit after finding null byte
 
 .macro	nullwrite	outstr
 	@ find length
 	ldr  r0, =\outstr	@Load outstr address ('\'' beacuse of macro)
 	mov  r1, r0			@Copy r0 to r1
 
-strlen_loop:
+1:
 	ldrb r2, [r1]		@Load byte from r1 address
 	cmp  r2, #0			@Check if it null byte
-	beq  null_found		@Go to label if null byte found
+	beq  2f				@Go to label if null byte found
 	add  r1, #1			@Increment pointer address
-	b    strlen_loop	@Process loop again
+	b    1b				@Process loop again
 
-null_found:
+2:
 	sub	r3, r1, r0		@ strlen = r1 - r0
 
 	@Setup write
