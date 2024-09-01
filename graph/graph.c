@@ -3,9 +3,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+struct node_list {
+    node_t *this;
+    node_list_t *next;
+};
+
+struct connection_list {
+    node_t *from;
+    node_t *to;
+    connection_list_t *next;
+};
 struct graph {
-    unsigned int node_count;
-    bool **edges;
+    node_list_t nodes;
+    connection_list_t connections;
 };
 
 void graph_destroy(graph_t *graph) {
@@ -14,41 +24,16 @@ void graph_destroy(graph_t *graph) {
         return;
     }
 
-    if (graph->edges == NULL) {
-        free(graph);
-        return;
-    }
+    /* TODO: free all nodes here */
 
-    for (size_t node = 0; node < graph->node_count; node++) {
-        if (graph->edges[node]) {
-            free(graph->edges[node]);
-        }
-    }
-
-    free(graph->edges);
     free(graph);
 }
 
-graph_t *graph_init(const unsigned int node_count) {
+graph_t *graph_init() {
 
-    graph_t *graph = malloc(sizeof(graph_t));
+    graph_t *graph = calloc(sizeof(graph_t), 1);
     if (!graph) {
         return NULL;
-    }
-
-    graph->node_count = node_count;
-    graph->edges = calloc(sizeof(bool*), node_count);
-    if (!graph->edges) {
-        free(graph);
-        return NULL;
-    }
-
-    for (size_t node = 0; node < node_count; node++) {
-        graph->edges[node] = calloc(sizeof(bool), node_count);
-        if (!graph->edges[node]) {
-            graph_destroy(graph);
-            return NULL;
-        }
     }
 
     return graph;
@@ -56,37 +41,62 @@ graph_t *graph_init(const unsigned int node_count) {
 
 void graph_print(graph_t *graph) {
 
+    connection_list_t *connection = &graph->connections;
+
     printf("digraph {\n");
 
-    for (size_t from_node = 0; from_node < graph->node_count; from_node++) {
-        for (size_t to_node = 0; to_node < graph->node_count; to_node++) {
-            if (graph->edges[from_node][to_node]) {
-                printf("%ld -> %ld;\n", from_node, to_node);
-            }
-        }
-    }
+    do {
+        if (connection->from && connection->next) {
+            printf("%s -> %s;\n", connection->from->name, connection->to->name);
+        } 
+        connection = connection->next;
+    } while (connection);
 
     printf("}\n");
 }
 
-bool graph_has_edge(graph_t *graph, unsigned int from_node, unsigned int to_node) {
+node_t *node_create(node_id_t id, const char *name) {
 
-    assert(graph != NULL);
-    assert(from_node < graph->node_count);
-    assert(to_node < graph->node_count);
-
-    return graph->edges[from_node][to_node];
-}
-
-bool graph_add_edge(graph_t *graph, unsigned int from_node, unsigned int to_node) {
-
-    bool exist = false;
-
-    if (graph_has_edge(graph, from_node, to_node)) {
-        exist = true;
-    } else {
-        graph->edges[from_node][to_node] = true;
+    node_t *node = malloc(sizeof(node_t));
+    if (node) {
+        node->id = id;
+        node->name = name;
     }
 
-    return exist;
+    return node;
+}
+
+void node_delete(node_t *node) {
+
+    if (node) {
+        free(node);
+    }
+}
+
+void graph_add_node(graph_t *graph, node_t *node) {
+
+    node_list_t *nodes = &graph->nodes;
+
+    while (nodes->this) {
+        nodes = nodes->next;
+    }
+
+    nodes->this = node;
+    nodes->next = calloc(sizeof(node_list_t), 1);
+}
+
+void graph_connect_nodes(graph_t *graph, node_t *source, node_t *target) {
+
+    connection_list_t *connection = &graph->connections;
+
+    while (connection->from && connection->to) {
+        if ((connection->from == source) && (connection->to == target)) {
+            return; /* connection exists */
+        }
+        connection = connection->next;
+    }
+
+    connection->from = source;
+    connection->to = target;
+    connection->next = calloc(sizeof(connection_list_t), 1);
 }

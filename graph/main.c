@@ -3,12 +3,21 @@
 int main(int argc, char const *argv[]) {
     
     graph_t *graph;
+    graph = graph_init();
 
-    graph = graph_init(3);
+    node_t *nodes[3];
+    nodes[0] = node_create(1, "first");
+    nodes[1] = node_create(2, "second");
+    nodes[2] = node_create(3, "third");
 
-    graph_add_edge(graph, 0, 1);
-    graph_add_edge(graph, 0, 2);
-    graph_add_edge(graph, 2, 1);
+    graph_add_node(graph, nodes[0]);
+    graph_add_node(graph, nodes[1]);
+    graph_add_node(graph, nodes[2]);
+
+    graph_connect_nodes(graph, nodes[0], nodes[1]);
+    graph_connect_nodes(graph, nodes[0], nodes[2]);
+    graph_connect_nodes(graph, nodes[2], nodes[1]);
+    graph_connect_nodes(graph, nodes[2], nodes[2]);
 
     graph_print(graph);
 
@@ -16,7 +25,8 @@ int main(int argc, char const *argv[]) {
 }
 
 /* TODO:
- * - add nodes objects
- * - reference nodes by it's objects (or names)
- * - print nodes names (instad of numbers) 
+ * - add nodes objects [done]
+ * - reference nodes by it's objects [done]
+ * - reference node by it's id or name 
+ * - print nodes names (instead of numbers) [done] 
 */
