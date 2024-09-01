@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct node_list {
     node_t *this;
@@ -99,4 +100,56 @@ void graph_connect_nodes(graph_t *graph, node_t *source, node_t *target) {
     connection->from = source;
     connection->to = target;
     connection->next = calloc(sizeof(connection_list_t), 1);
+}
+
+static node_t *graph_get_node_by_id(graph_t *graph, const node_id_t id) {
+
+    node_t *node = NULL;
+    node_list_t *nodes = &graph->nodes;
+
+    while (nodes->this && (nodes->this->id != id)) {
+        nodes = nodes->next;
+    }
+
+    if (nodes->this && (nodes->this->id == id)) {
+        node = nodes->this;
+    }
+
+    return node;
+}
+
+void graph_connect_nodes_by_id(graph_t *graph, const node_id_t source, const node_id_t target) {
+
+    node_t *source_node = graph_get_node_by_id(graph, source); 
+    node_t *target_node = graph_get_node_by_id(graph, target);
+
+    if (source_node && target_node) {
+        graph_connect_nodes(graph, source_node, target_node);
+    }
+}
+
+static node_t *graph_get_node_by_name(graph_t *graph, const char *name) {
+
+    node_t *node = NULL;
+    node_list_t *nodes = &graph->nodes;
+
+    while (nodes->this && strcmp(nodes->this->name, name)) {
+        nodes = nodes->next;
+    }
+
+    if (nodes->this && (strcmp(nodes->this->name, name) == 0)) {
+        node = nodes->this;
+    }
+
+    return node;
+}
+
+void graph_connect_nodes_by_name(graph_t *graph, const char *source, const char *target) {
+
+    node_t *source_node = graph_get_node_by_name(graph, source); 
+    node_t *target_node = graph_get_node_by_name(graph, target);
+
+    if (source_node && target_node) {
+        graph_connect_nodes(graph, source_node, target_node);
+    }
 }
