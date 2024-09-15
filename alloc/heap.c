@@ -194,6 +194,11 @@ void *heap_start() {
     return heap_ptr;
 }
 
+void *heap_end() {
+
+    return (heap_ptr + HEADER_SIZE_BYTES + HEAP_SIZE_BYTES + HEADER_SIZE_BYTES);
+}
+
 void mem_free(void *ptr) {
 
     if (((uint8_t*)ptr >= (heap_ptr + HEADER_SIZE_BYTES)) && ((uint8_t*)ptr < (heap_ptr + sizeof(uint32_t) * HEAP_SIZE))) {
