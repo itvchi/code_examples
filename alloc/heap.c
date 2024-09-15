@@ -34,7 +34,7 @@
 #define SIZE_MASK           0xFFFFFFF8
 #define SIZE_WORD           0
 
-#define FREE_BIT            0x00000000
+#define FREE_BIT            ~0x00000001
 #define ALLOC_BIT           0x00000001
 
 #define MODULE_ID_NONE      0x00
@@ -56,14 +56,14 @@
 #define HEAP_ARRAY_SIZE             ((HEADER_SIZE + HEAP_SIZE + HEADER_SIZE) * sizeof(uint32_t))
 
 uint32_t heap[HEADER_SIZE + HEAP_SIZE + HEADER_SIZE] = {
-    [0] = (HEAP_SIZE & SIZE_MASK) | FREE_BIT,    /* Starting header */
+    [0] = (HEAP_SIZE & SIZE_MASK) & FREE_BIT,    /* Starting header */
     [1] = ((MODULE_ID_NONE & 0xFF) << 24) | FIRST_MAGIC, /* Control block */
 
     [HEADER_SIZE + HEAP_SIZE] = SECOND_MAGIC, /* Control block */
-    [(HEADER_SIZE + HEAP_SIZE) + 1] = (HEAP_SIZE & SIZE_MASK) | FREE_BIT,  /* Ending header */
+    [(HEADER_SIZE + HEAP_SIZE) + 1] = (HEAP_SIZE & SIZE_MASK) & FREE_BIT,  /* Ending header */
 };
 
-uint8_t* heap_ptr = (uint8_t*)heap;
+uint8_t* const heap_ptr = (uint8_t*)heap;
 
 
 bool in_heap_range(void *ptr) {
@@ -73,7 +73,7 @@ bool in_heap_range(void *ptr) {
 
 bool is_free(void *ptr) {
 
-    return !(((uint32_t*)ptr)[SIZE_WORD] & ALLOC_BIT);
+    return !((*(uint32_t*)ptr) & ALLOC_BIT);
 }
 
 size_t size_in_header(void *ptr) {
@@ -96,6 +96,53 @@ void mark_alloc(void *ptr, const size_t size) {
 
     *(uint32_t*)ptr |= ALLOC_BIT;
     *(uint32_t*)((uint8_t*)ptr + HEADER_SIZE_BYTES + size + CB_SIZE_BYTES) |= ALLOC_BIT;
+}
+
+void mark_free(void *ptr) {
+
+    uint32_t *starting_header = (uint32_t*)((uint8_t*)ptr - HEADER_SIZE_BYTES);
+    size_t size;
+
+    *starting_header &= FREE_BIT;
+    size = *starting_header;
+    *(uint32_t*)((uint8_t*)ptr + size + CB_SIZE_BYTES) &= FREE_BIT;
+}
+
+void concat_right(void *ptr) {
+
+    uint32_t *starting_header = (uint32_t*)((uint8_t*)ptr - HEADER_SIZE_BYTES);
+    size_t size = *starting_header;
+    uint32_t *next_starting_header = (uint32_t*)((uint8_t*)starting_header + HEADER_SIZE_BYTES + size + HEADER_SIZE_BYTES);
+    uint32_t *next_ending_header;// = (uint32_t*)((uint8_t*)ptr + HEADER_SIZE_BYTES + old_size);
+    size_t next_size;
+
+    if (in_heap_range(next_starting_header) && is_free(next_starting_header)) {
+        next_size = *next_starting_header;
+        next_ending_header = (uint32_t*)((uint8_t*)next_starting_header + HEADER_SIZE_BYTES + next_size + CB_SIZE_BYTES);
+        size = size + 2 * HEADER_SIZE_BYTES + next_size;
+        
+        *starting_header = size;
+        *next_ending_header = size;
+    }
+}
+
+void concat_left(void *ptr) {
+
+    uint32_t *starting_header = (uint32_t*)((uint8_t*)ptr - HEADER_SIZE_BYTES);
+    size_t size = *starting_header;
+    uint32_t *ending_header = (uint32_t*)((uint8_t*)starting_header + HEADER_SIZE_BYTES + size);
+    size_t prev_size;
+    uint32_t *prev_ending_header = starting_header - HEADER_SIZE;
+    uint32_t *prev_starting_header;
+
+    if (((uint8_t*)prev_ending_header > heap_ptr) && is_free(prev_ending_header + 1)) {
+        prev_size = *(prev_ending_header + 1);
+        prev_starting_header = (uint32_t*)((uint8_t*)prev_ending_header - prev_size - HEADER_SIZE_BYTES);
+        size = prev_size + 2 * HEADER_SIZE_BYTES + size;
+
+        *prev_starting_header = size;
+        *(ending_header + 1) = size;
+    }
 }
 
 void edit_headers(void *ptr, const size_t old_size, const size_t size) {
@@ -145,6 +192,18 @@ void *mem_alloc(size_t size) {
 void *heap_start() {
 
     return heap_ptr;
+}
+
+void mem_free(void *ptr) {
+
+    if (((uint8_t*)ptr >= (heap_ptr + HEADER_SIZE_BYTES)) && ((uint8_t*)ptr < (heap_ptr + sizeof(uint32_t) * HEAP_SIZE))) {
+        mark_free(ptr);
+        /* Firstly concat right, to not invalidate header of "ptr" frame */
+        concat_right(ptr);
+        concat_left(ptr);
+    } else {
+        /* Ptr over heap range */
+    }
 }
 
 #endif /* _HEAP_H_ */
