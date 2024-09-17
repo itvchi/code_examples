@@ -3,10 +3,10 @@
 
 #include <stddef.h>
 
-#define HEAP_SIZE_BYTES 256
+//#define HEAP_SIZE_BYTES 256
 
-void *heap_start();
-void *heap_end();
+void *mem_start();
+void *mem_end();
 
 void *mem_alloc(const size_t size);
 void mem_free(void *ptr);

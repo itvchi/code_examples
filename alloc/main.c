@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "heap_api.h"
+#include "libmem/libmem_api.h"
 
 typedef struct {
     char c;
@@ -11,8 +11,8 @@ typedef struct {
 
 int main(int argc, char const *argv[]) {
 
-    printf("Heap starts @%p\n", heap_start());
-    printf("Heap ends @%p\n", heap_end());
+    printf("Heap starts @%p\n", mem_start());
+    printf("Heap ends @%p\n", mem_end());
     printf("\n");
 
     /* mem_alloc() test */
