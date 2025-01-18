@@ -12,14 +12,27 @@ object_pool_t obj_pool[OBJECT_POOL_CAPACITY] = {0};
 
 object_t *take() {
 
+    static size_t last_taken = 0;
     size_t idx;
     object_t *obj = NULL;
 
-    for (idx = 0; idx < OBJECT_POOL_CAPACITY; idx++) {
+    for (idx = last_taken; idx < OBJECT_POOL_CAPACITY; idx++) {
         if (obj_pool[idx].alloc == false) {
             obj_pool[idx].alloc = true;
             obj = &obj_pool[idx].obj;
+            last_taken = idx;
             break;
+        }
+    }
+    /* Traverse front of the pool if there is no free object found after last taken object */
+    if (obj == NULL) {
+        for (idx = 0; idx < last_taken; idx++) {
+            if (obj_pool[idx].alloc == false) {
+                obj_pool[idx].alloc = true;
+                obj = &obj_pool[idx].obj;
+                last_taken = idx;
+                break;
+            }
         }
     }
 

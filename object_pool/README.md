@@ -7,6 +7,7 @@ then the loop is repeated until specified number of elements were allocated and 
 Total number of allocated elements and maximum elements allocated in one loop iteration is the same for each example
 to have similar test condition for each implementation.
 
+--- TEST #1 ---
 Test results (10^8 elements, up to 10^2 elements per loop):
 - main_malloc - 1,2s
 - main_object_pool - 5,82s
@@ -19,3 +20,15 @@ Above tests shows that current object pool implementation is much worse than dyn
 for storing objects. The main reason of that behaviour is take() function implementation which traverse all object_pool
 to get free object, it takes a lot of time to trverse the loop what can be seen with second test where there were more
 elements get for each loop iteration.
+
+--- TEST #2 ---
+Test results (10^8 elements, up to 10^2 elements per loop):
+- main_malloc - 1,26s
+- main_object_pool - 0,93s
+
+Test results (10^7 elements, up to 10^3 elements per loop):
+- main_malloc - 0,13s
+- main_object_pool - 0,09s
+
+Using different method of traversing object pool for checkinf for free object significantly reduced execution time.
+Now object pool implementation has an advantage over dynamic allocation of the objects.
