@@ -32,3 +32,15 @@ Test results (10^7 elements, up to 10^3 elements per loop):
 
 Using different method of traversing object pool for checkinf for free object significantly reduced execution time.
 Now object pool implementation has an advantage over dynamic allocation of the objects.
+
+--- TEST #3 ---
+Test results (10^8 elements, up to 10^2 elements per loop):
+- main_malloc - 2,38s
+- main_object_pool - 0,81s
+
+Test results (10^7 elements, up to 10^3 elements per loop):
+- main_malloc - 1,03s
+- main_object_pool - 0,08s
+
+Increasing size of the object caused regression in performance of dynamic allocation example. The were no significant
+changes in object pool example performace.
