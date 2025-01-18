@@ -44,3 +44,28 @@ Test results (10^7 elements, up to 10^3 elements per loop):
 
 Increasing size of the object caused regression in performance of dynamic allocation example. The were no significant
 changes in object pool example performace.
+
+--- TEST #4 ---
+Test results (10^8 elements, up to 10^2 elements per loop):
+- main_malloc - 1,19s
+- main_object_pool - 0,94s
+- main_object_pool_freelist - 0,77s
+
+Test results (10^7 elements, up to 10^3 elements per loop):
+- main_malloc - 0,14s
+- main_object_pool - 0,09s
+- main_object_pool_freelist - 0,08s
+
+Test results (5x10^8 elements, up to 10^1 elements per loop):
+- main_malloc - 8,13s
+- main_object_pool - 7,94s
+- main_object_pool_freelist - 7,05s
+
+Test results (5x10^8 elements, up to 5x10^3 elements per loop):
+- main_malloc - 9,81s
+- main_object_pool - 4,44s
+- main_object_pool_freelist - 5,68s
+
+Tests erformaed after adding freelist for object pool implementation, which is slightly faster than first object pool
+code, but not for all cases. When number of element per loop increses, the freelist implementation is slower at some point.
+Above test were perfomed after reducing object_t size to same as in test #1 and test #2.

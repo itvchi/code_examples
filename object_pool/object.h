@@ -11,7 +11,7 @@ typedef struct {
     char name[64];
     state_t state;
     unsigned int value;
-    unsigned int data_blob[256];
+    // unsigned int data_blob[256];
 } object_t;
 
 #endif /* _OBJECT_H_ */
